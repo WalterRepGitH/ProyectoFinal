@@ -1,0 +1,18 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/WalterRepGitH/ProyectoFinal.git
+          searchPaths: configserverData
+          username: WalterRepGitH
+          password: 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
+
+  security:
+    user:
+      name: root
+      password: s3cr3t
