@@ -3,9 +3,11 @@ package com.someBank.client.service.impl;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.google.common.net.HttpHeaders;
 import com.someBank.client.entity.Client;
 import com.someBank.client.entity.extern.Account;
 import com.someBank.client.entity.extern.Credit;
@@ -21,21 +23,24 @@ public class ClientService implements IClientService {
 	@Autowired
 	private IClientRepository clientRepository;
 	
-	private final WebClient webClient;
+	private final WebClient webClientProduct = WebClient.create("http://localhost:8001");
     
-    public ClientService(WebClient.Builder webClientBuilder) {
-    	this.webClient = webClientBuilder.baseUrl("http://localhost:8001").build();
-    }
+//    public ClientService(WebClient.Builder webClientBuilder) {
+//    	//this.webClientProduct = WebClient.create("http://localhost:8001");
+//    			/*webClientBuilder.baseUrl("http://localhost:8001")
+//    			//.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+//    			.build();*/
+//    }
     
     public Flux<Account> findAccountsByClient(Integer id){
-        return webClient.get()
+        return webClientProduct.get()
                         .uri("/products/accounts/client/{id}", id)
                         .retrieve()
                         .bodyToFlux(Account.class);
     }
     
     public Flux<Credit> findCreditsByClient(Integer id){
-        return webClient.get()
+        return webClientProduct.get()
                         .uri("/products/credits/client/{id}", id)
                         .retrieve()
                         .bodyToFlux(Credit.class);
@@ -67,14 +72,36 @@ public class ClientService implements IClientService {
 
 	@Override
 	public Mono<Client> findById(Integer id) {
+		System.out.print("ingresando");
+		Flux<Account> accounts = findAccountsByClient(id).
+				map( account -> 
+				{
+					System.out.print("def");
+					return account;
+				}
+				);
 		
 		Mono<Client> client =  Mono.justOrEmpty(
 				clientRepository.findById(id)
 					).map( clientTmp -> {
+						
 						clientTmp.setAccounts(new ArrayList<>());
 						clientTmp.setCredits(new ArrayList<>());
+						
+						findAccountsByClient(id).
+						map( account -> 
+						{
+							System.out.print("abc");
+							clientTmp.getAccounts().add(account);
+							return account;
+						}
+						);
+						
 						return clientTmp;
 					});
+		
+
+		
 		return client;
 		/*
 		findAccountsByClient(id).doOnNext(accountTmp -> {

@@ -51,6 +51,7 @@ public class AccountController {
 	
 	@GetMapping("/client/{idClient}")
 	public Flux<Account> findByIdClient(@PathVariable Integer idClient){
+		System.out.println("Ingresando consulta account-"+idClient);
 		return accountService.findByIdClient(idClient);
 	}
 	

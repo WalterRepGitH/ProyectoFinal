@@ -76,11 +76,23 @@ public class AccountService implements IAccountService {
 		.map( masterAccount -> {
 			
 			Flux<MasterAccount> masterAccountWithSameType = masterAccountService.findByType(masterAccount.getType());
+			/*
+			Flux<Account> dd = masterAccountService
+					.findByType(masterAccount.getType())
+					.map( x -> 
+						{ 
+							return accountsOfClient.filter( y -> x.getId() == y.getIdMasterAccount()  );  
+						})
+					
+					;*/
 			
 			switch(masterAccount.getType()) {
 			case SAVING:
 			{
 				if(client.getType() == EType.PERSONAL) {
+					
+					//Flux.merge(masterAccountWithSameType,accountsOfClient).map( x -> { x. } ) ;
+					
 					//accountsOfClient.filter( x -> { x.getIdMasterAccount() })
 				}
 				

@@ -11,15 +11,13 @@ import lombok.ToString;
 @ToString
 public class MasterAccount {
 
+	public enum EType{
+		CURRENT, FIXEDTERM, SAVING
+	}
+
 	private String id;
 	
-	//private EType type;
-	
-	private String type;	/*
-		C	CURRENT
-		F	FIXEDTERM
-		S	SAVING
-		*/
+	private EType type;
 	
 	private double maintanceFee;
 	private boolean hasMaximumLimitMovements;
