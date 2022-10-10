@@ -2,8 +2,10 @@ package com.someBank.product.account.service;
 
 import com.someBank.product.account.entity.Account;
 import com.someBank.product.account.entity.AccountTransaction;
+
 import com.someBank.product.account.entity.MasterAccount;
 import com.someBank.product.account.entity.MasterAccount.EType;
+
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,7 +27,6 @@ public interface IAccountService {
 	Mono<AccountTransaction> withDraw(AccountTransaction withDraw) ;
 	
 	Mono<AccountTransaction> deposit(AccountTransaction deposit) ;
-
 	
 /*	Mono<String> addHolder(Integer idAccount, String holder);
 	

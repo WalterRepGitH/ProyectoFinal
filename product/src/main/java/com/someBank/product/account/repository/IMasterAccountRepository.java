@@ -14,4 +14,5 @@ public interface IMasterAccountRepository extends ReactiveMongoRepository<Master
 	
 	Mono<MasterAccount> findByIdAndType(String id, EType type);
 
+
 }

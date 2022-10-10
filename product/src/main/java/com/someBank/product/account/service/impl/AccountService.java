@@ -6,6 +6,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.someBank.product.account.entity.Account;
 import com.someBank.product.account.entity.AccountTransaction;
+
 import com.someBank.product.account.entity.MasterAccount;
 import com.someBank.product.account.entity.extern.Client;
 import com.someBank.product.account.entity.extern.Client.EType;
@@ -13,6 +14,7 @@ import com.someBank.product.account.repository.IAccountRepository;
 import com.someBank.product.account.repository.IAccountTransaction;
 import com.someBank.product.account.service.IAccountService;
 import com.someBank.product.account.service.IMasterAccountService;
+
 import com.someBank.product.credit.entity.Credit;
 
 import reactor.core.publisher.Flux;
@@ -27,6 +29,7 @@ public class AccountService implements IAccountService {
 	@Autowired
 	private IAccountTransaction accountTransactionRepository;
 	
+
 	@Autowired
 	private IMasterAccountService masterAccountService;
 	
@@ -34,6 +37,7 @@ public class AccountService implements IAccountService {
     
     public AccountService(WebClient.Builder webClientBuilder) {
     	this.webClient = webClientBuilder.baseUrl("http://localhost:8001").build();
+
     }
     
     private Mono<Client> findClient(Integer id){
@@ -47,13 +51,14 @@ public class AccountService implements IAccountService {
 	@Override
 	public Mono<Account> create(Account account) {
 		
-		Flux<Account> accountsOfClient = findByIdClient(account.getIdClient());
-		
+		Flux<Account> accountsOfClient = findByIdClient(account.getIdClient());		
+
 		return Mono.just(account)
 		.flatMap(accountTemp -> {
 			return findClient(accountTemp.getIdClient() );
 		})
 		.flatMap(client -> {
+
 			if(client == null) {
 				throw new RuntimeException("El cliente no existe");
 			}

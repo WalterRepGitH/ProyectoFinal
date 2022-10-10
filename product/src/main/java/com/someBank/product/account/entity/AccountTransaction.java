@@ -17,15 +17,19 @@ import lombok.ToString;
 @Document(collection = "accountTransaction")
 public class AccountTransaction {
 	
+
 	public enum EType{
 		WITHDRAW, DEPOSIT
 	}
+
 	
 	@Id
 	private String id;
 	private String idAccount;
 	
+
 	private EType typeAccountTransaction;				//	W	WITHDRA	-	D	DEPOSIT
+
 	private LocalDate date;
 	private double amount;
 

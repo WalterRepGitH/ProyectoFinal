@@ -4,7 +4,10 @@ spring:
   data:
     mongodb:
       uri: mongodb://127.0.0.1:27017/productBankDb
+<<<<<<< HEAD
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+=======
+>>>>>>> c6816c244593f737c9b27a9bd81affe2379bc6e2
