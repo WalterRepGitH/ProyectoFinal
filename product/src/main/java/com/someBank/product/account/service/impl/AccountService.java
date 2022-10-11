@@ -1,5 +1,6 @@
 package com.someBank.product.account.service.impl;
 
+import com.someBank.product.extern.service.IClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -8,14 +9,12 @@ import com.someBank.product.account.entity.Account;
 import com.someBank.product.account.entity.AccountTransaction;
 
 import com.someBank.product.account.entity.MasterAccount;
-import com.someBank.product.account.entity.extern.Client;
-import com.someBank.product.account.entity.extern.Client.EType;
+import com.someBank.product.extern.entity.Client;
+import com.someBank.product.extern.entity.Client.EType;
 import com.someBank.product.account.repository.IAccountRepository;
 import com.someBank.product.account.repository.IAccountTransaction;
 import com.someBank.product.account.service.IAccountService;
 import com.someBank.product.account.service.IMasterAccountService;
-
-import com.someBank.product.credit.entity.Credit;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,25 +27,14 @@ public class AccountService implements IAccountService {
 	
 	@Autowired
 	private IAccountTransaction accountTransactionRepository;
-	
 
 	@Autowired
 	private IMasterAccountService masterAccountService;
-	
-	private final WebClient webClient;
-    
-    public AccountService(WebClient.Builder webClientBuilder) {
-    	this.webClient = webClientBuilder.baseUrl("http://localhost:8001").build();
 
-    }
+	@Autowired
+	private IClientService clientService;
+
     
-    private Mono<Client> findClient(Integer id){
-    	System.out.println(id);
-        return webClient.get()
-                        .uri("/clients/{id}", id)
-                        .retrieve()
-                        .bodyToMono(Client.class);
-    }
 
 	@Override
 	public Mono<Account> create(Account account) {
@@ -55,7 +43,7 @@ public class AccountService implements IAccountService {
 
 		return Mono.just(account)
 		.flatMap(accountTemp -> {
-			return findClient(accountTemp.getIdClient() );
+			return clientService.findClient(accountTemp.getIdClient() );
 		})
 		.flatMap(client -> {
 
@@ -142,6 +130,7 @@ public class AccountService implements IAccountService {
 
 	@Override
 	public Mono<Account> findById(String id) {
+		System.out.println(id);
 		return accountRepository.findById(id);
 	}
 

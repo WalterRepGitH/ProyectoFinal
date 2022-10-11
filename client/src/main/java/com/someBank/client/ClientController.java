@@ -1,11 +1,7 @@
 package com.someBank.client;
 
+import com.someBank.client.message.KafkaProducer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,16 +25,9 @@ public class ClientController {
 
 	@Autowired
 	private IClientService clientService;
-	/*
-    private final KafkaStringProducer kafkaStringProducer;
 
-    @Autowired
-    ClientController(KafkaStringProducer kafkaStringProducer) {
-        this.kafkaStringProducer = kafkaStringProducer;
-    }*/
-	
 	@Autowired
-	private KafkaTemplate<String, Client> producer;
+	private KafkaProducer messageProducer;
 
 	
 	@DeleteMapping("/{id}")
@@ -59,7 +48,7 @@ public class ClientController {
 	
 	@PutMapping
 	public Mono<Client> update(@RequestBody Client client) {
-		sendClientMessage(client);
+		messageProducer.sendClientMessage(client);
 		return
 				Mono.just(client)
 				.flatMap(clientTmp -> {
@@ -68,13 +57,7 @@ public class ClientController {
 				
 	}
 	
-	public void sendClientMessage(Client client) {
-		Message<Client> message = MessageBuilder
-				.withPayload(client)
-				.setHeader(KafkaHeaders.TOPIC, "bootcamptopic")
-				.build();
-		producer.send(message);
-	}
+
 
 	@GetMapping("/{id}")
 	public Mono<Client> findById(@PathVariable Integer id) {

@@ -2,15 +2,12 @@ package com.someBank.client.service.impl;
 
 import java.util.ArrayList;
 
+import com.someBank.client.message.KafkaProducer;
+import com.someBank.client.extern.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import com.google.common.net.HttpHeaders;
 import com.someBank.client.entity.Client;
-import com.someBank.client.entity.extern.Account;
-import com.someBank.client.entity.extern.Credit;
 import com.someBank.client.repository.IClientRepository;
 import com.someBank.client.service.IClientService;
 
@@ -22,29 +19,13 @@ public class ClientService implements IClientService {
 	
 	@Autowired
 	private IClientRepository clientRepository;
-	
-	private final WebClient webClientProduct = WebClient.create("http://localhost:8001");
-    
-//    public ClientService(WebClient.Builder webClientBuilder) {
-//    	//this.webClientProduct = WebClient.create("http://localhost:8001");
-//    			/*webClientBuilder.baseUrl("http://localhost:8001")
-//    			//.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//    			.build();*/
-//    }
-    
-    public Flux<Account> findAccountsByClient(Integer id){
-        return webClientProduct.get()
-                        .uri("/products/accounts/client/{id}", id)
-                        .retrieve()
-                        .bodyToFlux(Account.class);
-    }
-    
-    public Flux<Credit> findCreditsByClient(Integer id){
-        return webClientProduct.get()
-                        .uri("/products/credits/client/{id}", id)
-                        .retrieve()
-                        .bodyToFlux(Credit.class);
-    }
+
+	@Autowired
+	private IProductService productService;
+
+	@Autowired
+	private KafkaProducer clientProducer;
+
 
 	@Override
 	public Mono<Client> create(Client client) {
@@ -67,51 +48,33 @@ public class ClientService implements IClientService {
 	public Flux<Client> findAll() {
 		return Flux.fromIterable(clientRepository.findAll());
 	}
-	
-
 
 	@Override
 	public Mono<Client> findById(Integer id) {
-		System.out.print("ingresando");
-		Flux<Account> accounts = findAccountsByClient(id).
-				map( account -> 
-				{
-					System.out.print("def");
-					return account;
-				}
-				);
-		
-		Mono<Client> client =  Mono.justOrEmpty(
+		return Mono.justOrEmpty(
 				clientRepository.findById(id)
-					).map( clientTmp -> {
-						
-						clientTmp.setAccounts(new ArrayList<>());
-						clientTmp.setCredits(new ArrayList<>());
-						
-						findAccountsByClient(id).
-						map( account -> 
-						{
-							System.out.print("abc");
-							clientTmp.getAccounts().add(account);
-							return account;
-						}
-						);
-						
-						return clientTmp;
-					});
-		
-
-		
-		return client;
-		/*
-		findAccountsByClient(id).doOnNext(accountTmp -> {
-			client.g
-		}); 
-		
-		Flux<Credit> credits = findCreditsByClient(id);
-		*/
-
-				//.orElse(null);
+					)
+				.map( clientTmp -> {
+					clientTmp.setAccounts(new ArrayList<>());
+					clientTmp.setCredits(new ArrayList<>());
+					return clientTmp;
+				})
+				.zipWhen( clientTmp -> productService.findAccountsByClient(id).collectList())
+					.map(
+							tuple -> {
+								Client client1 = tuple.getT1();
+								client1.setAccounts(tuple.getT2());
+								return client1;
+					})
+				.zipWhen( clientTmp -> productService.findCreditsByClient(id).collectList())
+					.map(
+							tuple -> {
+								Client client1 = tuple.getT1();
+								client1.setCredits(tuple.getT2());
+								return client1;
+							}
+						)
+				;
 	}
 
 }

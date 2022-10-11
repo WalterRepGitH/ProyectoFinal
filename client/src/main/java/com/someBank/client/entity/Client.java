@@ -12,8 +12,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-import com.someBank.client.entity.extern.Account;
-import com.someBank.client.entity.extern.Credit;
+import com.someBank.client.extern.entity.Account;
+import com.someBank.client.extern.entity.Credit;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

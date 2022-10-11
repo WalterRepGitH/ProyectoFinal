@@ -1,4 +1,4 @@
-package com.someBank.product.account.entity.extern;
+package com.someBank.product.extern.entity;
 
 import java.util.List;
 import java.util.Objects;

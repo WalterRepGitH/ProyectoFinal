@@ -1,4 +1,4 @@
-package com.someBank.client.entity.extern;
+package com.someBank.client.extern.entity;
 
 import java.time.LocalDate;
 

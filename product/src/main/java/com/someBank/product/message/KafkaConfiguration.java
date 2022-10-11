@@ -1,4 +1,4 @@
-package com.someBank.product;
+package com.someBank.product.message;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 //import org.apache.kafka.common.serialization.StringDeserializer;
-import com.someBank.product.account.entity.extern.Client;
+import com.someBank.product.extern.entity.Client;
 
 
 @EnableKafka

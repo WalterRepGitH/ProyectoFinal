@@ -1,4 +1,4 @@
-package com.someBank.client;
+package com.someBank.client.message;
 
 import java.util.HashMap;
 import java.util.Map;
